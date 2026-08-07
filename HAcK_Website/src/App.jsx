@@ -9,8 +9,8 @@ function App() {
               <h1 className="GroupName">The Stradibearius Quartet</h1>
               
           </div>
-          <div className = "InstrumentSection">
 
+          <div className = "MusicSection">
           </div>
 
           <div className = "BandSection">
@@ -23,8 +23,8 @@ function App() {
                   <p>Role: Circuit Designer</p>
               </div>
               <div className = "MemberCard">
-                  <h3>Chris Pennick</h3>
-                  <p>Role: Instruments chasis Assembler/Designer</p>
+                  <h3>Chris Penick</h3>
+                  <p>Role: Instruments chassis Assembler/Designer</p>
               </div>
               <div className = "MemberCard">
                   <h3>Kevin Alvarado</h3>
@@ -32,9 +32,24 @@ function App() {
               </div>
           </div>
 
-          <div className = "MusicSection">
-
+          <div className = "InstrumentSection">
+              <h2 className='InstrumentTitle'>Instruments Info</h2>
+              <div className = "InstrumentInfo">
+                  <div className = "InstrumentSubSec">
+                      <h3>Sound Profile</h3>
+                      <p>N/A - Waiting for instruments</p>
+                  </div>
+                  <div className = "InstrumentSubSec">
+                      <h3>Effects</h3>
+                      <p>N/A - Waiting for instruments</p>
+                  </div>
+                  <div className = "InstrumentSubSec">
+                      <h3>Sound Section</h3>
+                      <p>N/A - Waiting for instruments</p>
+                  </div>
+              </div>
           </div>
+
           <div className = "LiveSection">
 
           </div>
