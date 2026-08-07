@@ -1,6 +1,9 @@
+import { useState } from 'react'
+import Live from './Live.jsx'
 import './App.css'
 
 function App() {
+    const [liveMode, setLive] = useState(false)
     return (
         <div className = "HAcK_Website">
             <div className = "HomeSection">
@@ -74,9 +77,13 @@ function App() {
             </div>
 
             <div className = "LiveSection">
-
+                <button onClick={() => setLive(true)}>Enter Live Mode</button>
             </div>
 
+            {liveMode && (
+                <Live onExit={() => setLive(false)} />
+            )}
+            
         </div>
     )
 }
