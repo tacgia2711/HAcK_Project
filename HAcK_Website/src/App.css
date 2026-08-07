@@ -6,81 +6,27 @@
   --ucla-dark: #1a3c5a;
 }
 
-/* Page layout */
-body {
-  background: var(--ucla-light);
-  font-family: 'Inter', sans-serif;
-  margin: 0;
-  padding: 0;
+.MemberCard {
+    width: 220px;
+    padding: 20px;
+    border: 1px solid #ffffff;
+    border-radius: 12px;
+    text-align: center;
 }
 
-.ucla-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-top: 80px;
+.MemberCard h3 {
+    margin-bottom: 10px;
 }
 
-/* Title */
-.title {
-  font-size: 3rem;
-  color: var(--ucla-blue);
-  margin-bottom: 10px;
-  font-weight: 700;
+.MemberCard p {
+    margin: 0;
 }
 
-/* Names */
-.names {
-  color: var(--ucla-dark);
-  font-size: 1.1rem;
-  margin-bottom: 40px;
+.BandSection {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding: 40px 20px
 }
 
-/* Counter box */
-.counter-box {
-  background: white;
-  padding: 40px;
-  border-radius: 20px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-  text-align: center;
-  width: 320px;
-}
-
-/* Count display */
-.count-display {
-  font-size: 2rem;
-  font-weight: 600;
-  color: var(--ucla-blue);
-  margin-bottom: 25px;
-}
-
-/* Buttons */
-.button-row {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.ucla-btn {
-  background: var(--ucla-blue);
-  color: white;
-  border: none;
-  padding: 12px;
-  border-radius: 10px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.ucla-btn:hover {
-  background: var(--ucla-dark);
-}
-
-.reset {
-  background: var(--ucla-gold);
-  color: black;
-}
-
-.reset:hover {
-  background: #d99a00;
-}
