@@ -1,10 +1,37 @@
 import './App.css'
-import { Canvas,useFrame } from '@react-three/fiber'
-import { useRef,useState } from 'react'
+import { Canvas, useFrame } from '@react-three/fiber'
+import { useRef, useState, useEffect } from 'react'
 
 function Live({onExit}) {
     const[currentNote, setNote] = useState('C')
     const[currentEffect, setEffect] = useState('None')
+
+    useEffect(() => {
+        const socket = new WebSocket('ws://localhost:8765')
+
+        socket.onopen = () => {
+            console.log('Connected to WebSocket server')
+        }
+
+        socket.onmessage = (event) => {
+            const data = JSON.parse(event.data)
+
+            console.log('Received:', data)
+
+            if (data.type === 'note') {
+                setNote(data.value)
+            }
+        }
+
+        socket.onclose = () => {
+            console.log('WebSocket disconnected')
+        }
+
+        return () => {
+            socket.close()
+        }
+    }, [])
+
     return(
         <div className="LiveMode">
 
