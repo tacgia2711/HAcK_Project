@@ -4,6 +4,7 @@ import { useRef,useState } from 'react'
 
 function Live({onExit}) {
     const[currentNote, setNote] = useState('C')
+    const[currentEffect, setEffect] = useState('None')
     return(
         <div className="LiveMode">
 
@@ -29,8 +30,16 @@ function Live({onExit}) {
                 <button onClick={() => setNote('B')}>B</button>
             </div>
 
+            <div className="EffectControl">
+                <button onClick={() => setEffect('TO BE ADDED 1')}>TO BE ADDED 1</button>
+                <button onClick={() => setEffect('TO BE ADDED 2')}>TO BE ADDED 2</button>
+                <button onClick={() => setEffect('TO BE ADDED 3')}>TO BE ADDED 3</button>
+                <button onClick={() => setEffect('None')}>None</button>
+            </div>
+
             <h2>Current Note: {currentNote}</h2>
-            
+            <h2>Current Effect: {currentEffect}</h2>
+            <h2></h2>
             <button onClick={onExit}>Exit</button>
         </div>
 
