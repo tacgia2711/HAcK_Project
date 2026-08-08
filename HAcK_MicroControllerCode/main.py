@@ -52,6 +52,13 @@ FREQUENCIES = [
     [440.00, 466.16, 493.88]   # A4, A#4, B4
 ]
 
+NOTES = [
+    ['C4', 'C#4', 'D4'],
+    ['D#4', 'E4', 'F4'],
+    ['F#4', 'G4', 'G#4'],
+    ['A4', 'A#4', 'B4']
+]
+
 # --- Pre-Compute Wavetables (Array Optimized) ---
 print("Initializing dual wavetables (Complex and Fuzzed Sine)...")
 complex_tone_buffers = {}
@@ -121,15 +128,24 @@ for _ in range(NUM_VOICES):
 
 def scan_keypad():
     pressed = []
+
     for row_idx, row in enumerate(row_pins):
         row.value(1) 
+
         for col_idx, col in enumerate(col_pins):
             if col.value() == 1: 
-                pressed.append(FREQUENCIES[row_idx][col_idx])
+
+                freq = FREQUENCIES[row_idx][col_idx]
+                note = NOTES[row_idx][col_idx]
+
+                pressed.append((freq,note))
+
                 if len(pressed) == MAX_SIMULTANEOUS_KEYS:
                     row.value(0) 
                     return pressed
+                
         row.value(0) 
+
     return pressed 
 
 # --- Main Event Loop ---
@@ -141,7 +157,10 @@ was_strumming = False
 try:
     while True:
         # 1. Read Inputs
-        current_freqs = scan_keypad()
+        current_keys = scan_keypad()
+
+        current_freqs = [freq for freq, note in current_keys]
+
         x_val = x_axis.read_u16()
         is_strumming = (x_val < LEFT_THRESHOLD) or (x_val > RIGHT_THRESHOLD)
         master_vol = slide_pot.read_u16() / 65535.0
@@ -171,7 +190,9 @@ try:
         
         # 2. Dynamic Voice Trigger Logic
         if is_strumming and not was_strumming and len(current_freqs) > 0:
-            for freq in current_freqs:
+            for freq, note in current_keys:
+                print('{"type":"note","value":"%s"}' % note)
+
                 target_voice = None
                 
                 # Option A: Check if this exact frequency is already playing and re-use it to prevent phasing
