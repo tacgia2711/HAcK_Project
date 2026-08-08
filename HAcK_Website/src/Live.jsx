@@ -3,6 +3,7 @@ import { Canvas,useFrame } from '@react-three/fiber'
 import { useRef,useState } from 'react'
 
 function Live({onExit}) {
+    const[currentNote, setNote] = useState('C')
     return(
         <div className="LiveMode">
 
@@ -14,16 +15,27 @@ function Live({onExit}) {
                     <directionalLight
                         position = {[2,2,2]} intensity = {2}
                     />
-                    <Cube />
+                    <Cube Note={currentNote}/>
                 </Canvas>
             </div>
 
+            <div>
+                <button onClick={() => setNote('C')}>C</button>
+                <button onClick={() => setNote('D')}>D</button>
+                <button onClick={() => setNote('E')}>E</button>
+                <button onClick={() => setNote('F')}>F</button>
+                <button onClick={() => setNote('G')}>G</button>
+                <button onClick={() => setNote('A')}>A</button>
+                <button onClick={() => setNote('B')}>B</button>
+            </div>
+            
             <button onClick={onExit}>Exit</button>
         </div>
+
     )
 }
 
-function Cube() {
+function Cube({Note}) {
     const cubeRef = useRef()
 
     useFrame(() => {
@@ -34,7 +46,15 @@ function Cube() {
     return (
         <mesh ref={cubeRef}>
             <boxGeometry args={[1.5,1.5,1.5]}/>
-            <meshStandardMaterial color="yellow" />
+            <meshStandardMaterial color={Note === 'C' ? 'yellow': 
+                                         Note === 'D' ? 'orange':
+                                         Note === 'E' ? 'red':
+                                         Note === 'F' ? 'green': 
+                                         Note === 'G' ? 'blue':
+                                         Note === 'A' ? 'purple':
+                                         Note === 'B' ? 'pink':
+                                         'white'
+            } />
         </mesh>
     )
 }
