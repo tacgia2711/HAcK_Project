@@ -6,32 +6,109 @@
   --ucla-dark: #1a3c5a;
 }
 
+/*Main Parent of Member Card Section*/
+.BandSection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    gap:20px;
+    padding: 40px 20px;
+
+    background: var(--ucla-blue);
+}
+
 .MemberCard {
-    width: 220px;
-    padding: 20px;
-    border: 1px solid #ffffff;
+    width: 95%;
+    max-width: 950px;
+
+    border: 2px solid white;
     border-radius: 12px;
+    
+    overflow: hidden;
+    color: var(--ucla-light);
+}
+
+.MemberCard.open {
+    width: 650px;
+}
+
+/*Member Main section - Names and Role*/
+.MemberMain {
+    display: grid;
+    grid-template-columns: 200px 1fr auto;
+    align-items: center;
+
+    gap: 0px;
+    padding: 20px 30px;
+}
+
+.MemberMain h3 {
+    margin: 0;
     text-align: center;
 }
 
-.MemberCard h3 {
-    margin-bottom: 10px;
+.MemberMain p {
+    margin: 0 20px;
+    text-align: left;
 }
 
-.MemberCard p {
+/*Card Button Section*/
+.CardButton {
+    padding: 10px 16px;
+
+    background: var(--ucla-gold);
+    color: var(--ucla-dark);
+
+    border: none;
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+.CardButton:hover {
+    background:white;
+}
+
+.CardButton:active {
+    transform: translateY(1px);
+}
+
+/*Intro Section*/
+.MemberIntro {
+    max-height: 0;
+    opacity: 0;
+
+    overflow: hidden;
+
+    padding: 0 30px;
+
+    transition:
+        max-height 0.4s ease,
+        opacity 0.4s ease,
+        padding 0.4s ease;
+}
+
+.MemberIntro.show {
+    max-height: 400px;
+    opacity: 1;
+
+    padding: 20px 30px;
+
+    border-top: 1.5px dashed white;
+}
+
+.MemberIntro p {
     margin: 0;
+
+    text-align: left;
+    line-height: 1.6;
 }
 
-.BandSection {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    flex-wrap: wrap;
-    padding: 40px 20px;
-    background: var(--ucla-blue);
-    color: white;
-}
 
+/*Main Parent of the Instrument Section*/
 .InstrumentSection {
     background: #ffb300;
     padding: 40px 20px;
@@ -84,6 +161,7 @@
     margin: 0 auto 20px auto;
 }
 
+/*Main Parent of the Live Section*/
 .LiveMode {
     position: fixed;
     top: 0;
@@ -97,7 +175,8 @@
     z-index: 1000;
 
     display: flex;
-    flex-direction: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
 }
+

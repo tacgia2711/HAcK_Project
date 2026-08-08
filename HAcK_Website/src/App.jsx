@@ -2,23 +2,26 @@ import { useState } from 'react'
 import Live from './Live.jsx'
 import './App.css'
 
-function MemberCard ({name, role, intro}) {
+function MemberCard ({firstName, lastName, role, intro}) {
     const [openCard, setOpen] = useState(false)
 
     return (
-        <div className = "MemberCard">
-            
-            <h3>{name}</h3>
+        <div className = {`MemberCard ${openCard ? 'open' : ''}`}>
+            <div className = "MemberMain">
+                <h3>{firstName} {lastName}</h3>
 
-            <p>Role: {role}</p>
+                <p>Role: {role}</p>
 
-            <button onClick={() => setOpen(!openCard)} className = "CardButton">
-                About {name}
-            </button>
+                <button onClick={() => setOpen(!openCard)} className = "CardButton">
+                    <strong>
+                        {openCard ? 'Close': "About " + firstName}
+                    </strong>
+                </button>
+            </div>  
 
-            {openCard && (
+            <div className = {`MemberIntro ${openCard ? 'show' : ''}`}>
                 <p>{intro}</p>
-            )}
+            </div>
         </div>
     )
 }
@@ -43,25 +46,29 @@ function App() {
             <div className = "BandSection">
 
                 <MemberCard 
-                    name = "Kien Nguyen"
-                    role = "Web Developer"
+                    firstName = "Kien"
+                    lastName = "Nguyen"
+                    role = "Web Developer - Frontend and Backend"
                     intro = ""
                 />
 
                 <MemberCard 
-                    name = "Matthew Kim"
+                    firstName = "Matthew"
+                    lastName= "Kim"
                     role = "Circuit Designer - Tester"
                     intro = "My name is Matthew Kim, and I’m an Electrical Engineering major transferring to UCLA from El Camino College! I was born and raised in Torrance, California, but currently live in Long Beach. I’m a big fan of old-school video games and CRT TVs. My favorite food to eat is Korean BBQ. "
                 />
 
                 <MemberCard 
-                    name = "Chris Penick"
-                    role = "Circuit Designer - Tester"
+                    firstName = "Chris"
+                    lastName = "Penick"
+                    role = "CAD Designer - Chassis Assembler"
                     intro = ""
                 />
 
                 <MemberCard 
-                    name = "Kevin Alvarado"
+                    firstName = "Kevin"
+                    lastName = "Alvarado"
                     role = "Circuit Designer - Tester"
                     intro = "My name is Kevin Alvarado. My major is electrical engineering. I am from South Central near USC for reference, and my community college is Los Angeles Trade Technical College. My favorite football team is Real Madrid. My favorite food is the Fried Rice from Vim’s Thai food in North Hollywood. "
                 />
