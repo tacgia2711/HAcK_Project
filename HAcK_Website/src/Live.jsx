@@ -4,7 +4,7 @@ import { useRef, useState, useEffect } from 'react'
 
 function Live({onExit}) {
     const[currentNote, setNote] = useState('C4')
-    const[currentEffect, setEffect] = useState('None')
+    const[currentEffect, setEffect] = useState({distortion: false, reverb: false, bitcrush: false})
 
     useEffect(() => {
         const socket = new WebSocket('ws://localhost:8765')
@@ -20,6 +20,13 @@ function Live({onExit}) {
 
             if (data.type === 'note') {
                 setNote(data.value)
+            }
+
+            if (data.type === 'effect') {
+                setEffect(prev => ({
+                    ...prev,
+                    [data.value]: data.enabled
+                }))
             }
         }
 
@@ -43,7 +50,7 @@ function Live({onExit}) {
                     <directionalLight
                         position = {[2,2,2]} intensity = {2}
                     />
-                    <Cube Note={currentNote}/>
+                    <Cube Note={currentNote} Effects = {currentEffect}/>
                 </Canvas>
             </div>
 
@@ -58,22 +65,28 @@ function Live({onExit}) {
             </div>
 
             <div className="EffectControl">
-                <button onClick={() => setEffect('TO BE ADDED 1')}>TO BE ADDED 1</button>
-                <button onClick={() => setEffect('TO BE ADDED 2')}>TO BE ADDED 2</button>
-                <button onClick={() => setEffect('TO BE ADDED 3')}>TO BE ADDED 3</button>
-                <button onClick={() => setEffect('None')}>None</button>
+                
             </div>
 
             <h2>Current Note: {currentNote}</h2>
-            <h2>Current Effect: {currentEffect}</h2>
-            <h2></h2>
+            <div className = "SoundEffect">
+                <h2>
+                    Distortion: {currentEffect.distortion ? "On" : "Off"}
+                </h2>
+                <h2>
+                    Reverb: {currentEffect.reverb ? "On" : "Off"}
+                </h2>
+                <h2>
+                    Bitcrush: {currentEffect.bitcrush ? "On" : "Off"}
+                </h2>
+            </div>
             <button onClick={onExit}>Exit</button>
         </div>
 
     )
 }
 
-function Cube({Note}) {
+function Cube({Note, Effects}) {
     const cubeRef = useRef()
 
     const scale =   Note === 'C4' ? 0.9: 

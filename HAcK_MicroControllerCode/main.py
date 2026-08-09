@@ -299,16 +299,22 @@ try:
             curr_rev = btn_reverb.value()
             curr_bit = btn_bitcrush.value()
             
+            #Distortion Button Toggle
             if curr_dist == 0 and was_btn_dist == 1:
                 DISTORTION_ENABLED = not DISTORTION_ENABLED
+                print("Distortion Toggled:", DISTORTION_ENABLED)
             was_btn_dist = curr_dist
-            
+                    
+            #Reverb Button Toggle
             if curr_rev == 0 and was_btn_rev == 1:
                 REVERB_ENABLED = not REVERB_ENABLED
+                print("Reverb Toggled:", REVERB_ENABLED)
             was_btn_rev = curr_rev
-            
+                    
+                    #Bitcrush Button Toggle
             if curr_bit == 0 and was_btn_bit == 1:
                 BITCRUSH_ENABLED = not BITCRUSH_ENABLED
+                print("Bitcrush Toggled:", BITCRUSH_ENABLED)
             was_btn_bit = curr_bit
             
             # Dynamic Voice Trigger Logic
