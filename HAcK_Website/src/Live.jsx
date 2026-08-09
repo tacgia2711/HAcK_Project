@@ -4,7 +4,7 @@ import { useRef, useState, useEffect } from 'react'
 function Live({onExit}) {
     const[currentNote, setNote] = useState('C4')
     const[currentEffect, setEffect] = useState({distortion: false, reverb: false, bitcrush: false})
-    const [volume, setVolume] = useState(0.5)
+    const[currentVolume, setVolume] = useState(0.7)
 
     useEffect(() => {
         const socket = new WebSocket('ws://localhost:8765')
@@ -52,43 +52,44 @@ function Live({onExit}) {
                 <Wave
                     Note = {currentNote}
                     Effects = {currentEffect}
-                    Volume = {volume}
+                    Volume = {currentVolume}
                 />
            </div>
-
-            <div>
-                <button onClick={() => setNote('C4')}>C4</button>
-                <button onClick={() => setNote('C#4')}>C#4</button>
-                <button onClick={() => setNote('D4')}>D4</button>
-                <button onClick={() => setNote('D#4')}>D#4</button>
-                <button onClick={() => setNote('E4')}>E4</button>
-                <button onClick={() => setNote('F4')}>F4</button>
-                <button onClick={() => setNote('F#4')}>F#4</button>
-                <button onClick={() => setNote('G4')}>G4</button>
-                <button onClick={() => setNote('G#4')}>G#4</button>
-                <button onClick={() => setNote('A4')}>A4</button>
-                <button onClick={() => setNote('A#4')}>A#4</button>
-                <button onClick={() => setNote('B4')}>B4</button>
-                <button onClick={() => setEffect(prev => ({
-                                                ...prev,
-                                                distortion: !prev.distortion
-                }))}> Distortion </button>
-                <button onClick={() => setEffect(prev => ({
-                                                ...prev,
-                                                reverb: !prev.reverb
-                }))}> Reverb </button>
-                <button onClick={() => setEffect(prev => ({
-                                                ...prev,
-                                                bitcrush: !prev.bitcrush
-                }))}>Bitcrush</button>
-            </div>
 
             <div className="EffectControl">
                 
             </div>
 
             <h2>Current Note: {currentNote}</h2>
-            <h2>Volume: {Math.round(volume * 100)}%</h2>
+
+            <div className="VolumeDisplay">
+
+                <div className="VolumeHeader">
+                    <span>Volume</span>
+                    <span>{Math.round(currentVolume * 100)}%</span>
+                </div>
+
+                <div className="VolumeBar">
+                    <div
+                        className="VolumeLevel"
+                        style={{
+                            width: `${currentVolume * 100}%`
+                        }}
+                    />
+                </div>
+
+            <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={currentVolume}
+                onChange={(event) =>
+                    setVolume(Number(event.target.value))
+                }
+            />
+
+            </div>
             <div className = "SoundEffect">
                 <h2>
                     Distortion: {currentEffect.distortion ? "On" : "Off"}
@@ -149,7 +150,7 @@ function Wave({Note, Effects, Volume}) {
 
         const cycles = 2 + index *0.25
         const speed = 0.04 + index*0.003
-        const amplitude = 10 + Volume*90
+        const amplitude = 10 + Volume * 90
         
         function createWave(phaseOffset = 0, amplitudeMultiplier = 1) {
             let path = ''
@@ -220,7 +221,7 @@ function Wave({Note, Effects, Volume}) {
          return () => {
             cancelAnimationFrame(animationID)
          }
-    }, [Note,Effects,index])
+    }, [Note,Effects,index, Volume])
 
     return (
         <div className= "WaveVisualize">
