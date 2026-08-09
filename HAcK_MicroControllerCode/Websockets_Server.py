@@ -6,9 +6,7 @@ import json
 import websockets
 from websockets.exceptions import ConnectionClosed
 
-notes = ["C", "D", "E", "F", "G", "A", "B"]
-
-PICO_PORT = "COM7"
+PICO_PORT = 'COM7'
 
 pico = serial.Serial(PICO_PORT, 115200, timeout = 0.1)
 

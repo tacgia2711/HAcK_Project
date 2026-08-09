@@ -2,14 +2,88 @@ import gc
 # Force garbage collection to clear previous RAM before allocating new buffers
 gc.collect() 
 
+import time
 import math
 import array
-from machine import Pin, ADC, I2S
+import random
+from machine import Pin, ADC, SoftI2C, I2S
+import ssd1306
+import framebuf
 
-# --- Hardware Setup ---
-bck_pin = Pin(16)
-ws_pin = Pin(17)
-sdout_pin = Pin(18)
+# --- 1. Hardware Setup ---
+
+# OLED Screen
+i2c = SoftI2C(sda=Pin(0), scl=Pin(1), freq=400000)
+oled = ssd1306.SSD1306_I2C(128, 64, i2c)
+
+# Custom Logo Data
+logo_data = bytearray([
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x24, 0x00, 0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x12, 0x8a, 0x93, 0x52, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x92, 0x70, 0x52, 0x12, 0x4a, 0x09, 0x00, 0x00, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x01, 0x09, 0x68, 0x92, 0x4a, 0x92, 0x12, 0x48, 0x30, 0x80, 0x00, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x09, 0x10, 0xa5, 0x50, 0x00, 0x00, 0x02, 0xc4, 0x10, 0x80, 0x00, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0xc1, 0x10, 0x90, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x92, 0x00, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x3c, 0xa8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0a, 0x34, 0x40, 0x00, 0x00, 
+    0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x24, 0x10, 0x00, 0x00, 
+    0x00, 0x08, 0x24, 0x28, 0x00, 0x00, 0x01, 0x40, 0x00, 0x10, 0x00, 0x00, 0x01, 0x26, 0x88, 0x00, 
+    0x00, 0x4a, 0x90, 0x00, 0x00, 0x00, 0x02, 0x15, 0x48, 0x84, 0x00, 0x00, 0x00, 0x68, 0x30, 0x00, 
+    0x01, 0x04, 0x48, 0x00, 0x00, 0x00, 0x00, 0x49, 0x25, 0x20, 0x00, 0x00, 0x00, 0x04, 0x42, 0x00, 
+    0x04, 0xc3, 0x40, 0x00, 0x00, 0x00, 0x01, 0x2a, 0x92, 0x48, 0x00, 0x00, 0x00, 0x00, 0x99, 0x20, 
+    0x00, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0xaa, 0x4c, 0x90, 0x00, 0x00, 0x00, 0x00, 0x08, 0x50, 
+    0x00, 0x30, 0x00, 0x08, 0x00, 0x24, 0x00, 0xa1, 0xb1, 0x20, 0x01, 0x48, 0x00, 0x80, 0x01, 0x80, 
+    0x00, 0x00, 0x00, 0x02, 0xa5, 0x00, 0x01, 0x55, 0x6a, 0x48, 0x02, 0x25, 0x54, 0x08, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x29, 0x28, 0xa8, 0x02, 0x96, 0xa9, 0x20, 0x00, 0xaa, 0x92, 0x34, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x05, 0x52, 0x48, 0x00, 0xaa, 0x0c, 0x90, 0x01, 0x54, 0x49, 0x08, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x0a, 0xaa, 0x90, 0x00, 0x93, 0xb4, 0x40, 0x00, 0x87, 0x24, 0x20, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x09, 0x1a, 0x4a, 0x00, 0x54, 0x4a, 0x90, 0x02, 0x6a, 0xc9, 0x12, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x14, 0xad, 0x20, 0x01, 0x0a, 0xa1, 0x08, 0x02, 0x98, 0x92, 0x40, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x0a, 0xa1, 0x48, 0x02, 0xa2, 0x94, 0x20, 0x00, 0x4a, 0xc8, 0x20, 0x00, 0x00, 
+    0x00, 0x00, 0x08, 0x05, 0x76, 0x96, 0x01, 0x48, 0xa0, 0x94, 0x02, 0x25, 0x24, 0x40, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x01, 0x0a, 0x45, 0x04, 0xa4, 0x05, 0x40, 0x01, 0x48, 0x81, 0x28, 0x00, 0x00, 
+    0x00, 0x00, 0x01, 0x0a, 0x69, 0x1a, 0x05, 0x2a, 0x90, 0x2a, 0x0a, 0x12, 0x28, 0x84, 0x00, 0x00, 
+    0x00, 0x00, 0x02, 0x14, 0x88, 0x61, 0x10, 0xa9, 0x4a, 0x81, 0x04, 0xa4, 0x82, 0x52, 0x00, 0x00, 
+    0x00, 0x00, 0x01, 0x49, 0x22, 0x0d, 0x4a, 0x45, 0x24, 0xa8, 0x12, 0x40, 0x08, 0x14, 0x80, 0x00, 
+    0x00, 0x00, 0x0a, 0x22, 0x91, 0x21, 0x25, 0x2a, 0x91, 0x05, 0x49, 0x2a, 0xa2, 0x82, 0x00, 0x00, 
+    0x00, 0x00, 0x09, 0x49, 0x54, 0x14, 0x90, 0x84, 0xa4, 0x50, 0x24, 0x84, 0x28, 0x49, 0x00, 0x00, 
+    0x00, 0x00, 0x12, 0x28, 0xa2, 0xa2, 0x4a, 0x52, 0x41, 0x0a, 0x92, 0x51, 0xda, 0xa2, 0x80, 0x00, 
+    0x00, 0x00, 0x09, 0x0a, 0x10, 0x49, 0x22, 0x29, 0x14, 0x42, 0x24, 0x83, 0x68, 0xb0, 0x00, 0x00, 
+    0x00, 0x00, 0x12, 0x45, 0x4d, 0x14, 0x94, 0x84, 0x82, 0x14, 0x92, 0xaa, 0xb2, 0xdd, 0x00, 0x00, 
+    0x00, 0x00, 0x09, 0x28, 0xb4, 0xa2, 0x48, 0xa9, 0x51, 0x42, 0x24, 0x57, 0x51, 0x68, 0x00, 0x00, 
+    0x00, 0x00, 0x12, 0x02, 0x55, 0x52, 0xa2, 0x24, 0x08, 0x11, 0x12, 0x89, 0xaa, 0xac, 0x00, 0x00, 
+    0x00, 0x00, 0x04, 0xa9, 0x58, 0x68, 0x14, 0x92, 0xa5, 0x44, 0x88, 0x52, 0x61, 0x70, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x08, 0xa5, 0xb9, 0x49, 0x2a, 0x90, 0x12, 0x22, 0x89, 0x25, 0x9a, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x24, 0x70, 0xd0, 0x24, 0x84, 0x4a, 0x88, 0x80, 0x24, 0x95, 0x60, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x12, 0x9b, 0x65, 0x49, 0x29, 0x24, 0x44, 0x24, 0x89, 0x23, 0xb0, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x2a, 0xad, 0x00, 0x24, 0x92, 0xd2, 0x92, 0x82, 0x52, 0x7d, 0x40, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x0a, 0x75, 0x2a, 0x92, 0x48, 0xe8, 0x20, 0x01, 0x0a, 0xaa, 0x80, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x2d, 0xd5, 0x01, 0x09, 0x25, 0x0a, 0x95, 0x04, 0x6d, 0x55, 0x00, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x56, 0x8d, 0xaa, 0x05, 0x29, 0xd4, 0x48, 0x05, 0x53, 0xb9, 0xa0, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x01, 0x2a, 0x88, 0x88, 0x84, 0x51, 0x22, 0x08, 0xba, 0xd5, 0x40, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x52, 0x9b, 0x25, 0x05, 0x21, 0x04, 0xa8, 0x05, 0xd6, 0x5e, 0xa8, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x88, 0x6d, 0x12, 0x12, 0x54, 0xd9, 0x45, 0x11, 0x5a, 0x12, 0xe0, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x51, 0x35, 0x49, 0x14, 0x8a, 0x24, 0x10, 0x15, 0xad, 0x2f, 0x40, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x48, 0x00, 0x24, 0x82, 0x51, 0x42, 0xcf, 0x89, 0x76, 0x59, 0xa8, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x24, 0x95, 0x52, 0x14, 0x24, 0x94, 0xa9, 0x50, 0xaa, 0x6e, 0xc0, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x12, 0x02, 0x09, 0x02, 0x88, 0x2a, 0xac, 0x45, 0x3a, 0xb5, 0x10, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x28, 0x45, 0x64, 0x05, 0x65, 0x10, 0xb7, 0x82, 0x44, 0xdb, 0x40, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x44, 0x00, 0x90, 0x08, 0xa8, 0x5f, 0x55, 0x44, 0x80, 0x00, 0x10, 0x00, 0x00, 
+    0x00, 0x00, 0x01, 0x21, 0x05, 0x28, 0x12, 0x22, 0x0a, 0x80, 0x01, 0x28, 0x09, 0x44, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x48, 0x14, 0x84, 0x55, 0x49, 0x60, 0x57, 0x4a, 0x40, 0x00, 0x34, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x00, 0x02, 0xa0, 0x00, 0x94, 0x05, 0x20, 0x2a, 0x04, 0x00, 0x00, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x22, 0x92, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x09, 0x44, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x8a, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+])
+logo_fb = framebuf.FrameBuffer(logo_data, 128, 64, framebuf.MONO_HLSB)
 
 # --- Physical Effect Buttons ---
 btn_distortion = Pin(9, Pin.IN, Pin.PULL_UP)
@@ -21,6 +95,15 @@ was_btn_dist = 1
 was_btn_rev = 1
 was_btn_bit = 1
 
+DISTORTION_ENABLED = False 
+REVERB_ENABLED = False 
+BITCRUSH_ENABLED = False
+
+# I2S Audio
+bck_pin = Pin(16)
+ws_pin = Pin(17)
+sdout_pin = Pin(18)
+
 audio_out = I2S(0, 
                 sck=bck_pin, 
                 ws=ws_pin, 
@@ -31,20 +114,20 @@ audio_out = I2S(0,
                 rate=22050, 
                 ibuf=4096)
 
-x_axis = ADC(Pin(26))
-slide_pot = ADC(Pin(27)) # Master Volume Potentiometer
-LEFT_THRESHOLD = 15000
-RIGHT_THRESHOLD = 55000
+# Joysticks & Slide Pot (Y-Axis on GP26, X-Axis on GP28)
+joystick_x = ADC(Pin(28))
+joystick_y = ADC(Pin(26))
+slide_pot = ADC(Pin(27)) 
+joystick_btn = Pin(22, Pin.IN, Pin.PULL_UP)
 
+LEFT_THRESHOLD = 8000
+RIGHT_THRESHOLD = 58000
+
+# Matrix Keypad
 row_pins = [Pin(i, Pin.OUT) for i in range(2, 6)]
 col_pins = [Pin(i, Pin.IN, Pin.PULL_DOWN) for i in range(6, 9)]
 
-# --- Software Toggles & Effects ---
-DISTORTION_ENABLED = False 
-REVERB_ENABLED = False 
-BITCRUSH_ENABLED = False
-
-# --- Musical Setup ---
+# --- 2. Musical Setup (Dual Wavetables) ---
 FREQUENCIES = [
     [261.63, 277.18, 293.66],  # C4, C#4, D4 
     [311.13, 329.63, 349.23],  # D#4, E4, F4
@@ -52,15 +135,19 @@ FREQUENCIES = [
     [440.00, 466.16, 493.88]   # A4, A#4, B4
 ]
 
+#Notes
 NOTES = [
-    ['C4', 'C#4', 'D4'],
-    ['D#4', 'E4', 'F4'],
-    ['F#4', 'G4', 'G#4'],
-    ['A4', 'A#4', 'B4']
+    ["C4",  "C#4", "D4"],
+    ["D#4", "E4",  "F4"],
+    ["F#4", "G4",  "G#4"],
+    ["A4",  "A#4", "B4"]
 ]
 
-# --- Pre-Compute Wavetables (Array Optimized) ---
-print("Initializing dual wavetables (Complex and Fuzzed Sine)...")
+print("Initializing dual wavetables...")
+oled.fill(0)
+oled.text("Loading Synth...", 4, 32, 1)
+oled.show()
+
 complex_tone_buffers = {}
 sine_tone_buffers = {}
 
@@ -87,7 +174,7 @@ for row in FREQUENCIES:
             # Fundamental sine wave
             fundamental = math.sin(t_cycle)
             
-            # --- 1. Complex Bowed String ---
+            # Complex Bowed String
             harmonic_2 = (1/2) * math.sin(2 * t_cycle)
             harmonic_3 = (1/3) * math.sin(3 * t_cycle) 
             harmonic_4 = (1/4) * math.sin(4 * t_cycle)
@@ -96,7 +183,7 @@ for row in FREQUENCIES:
             
             combined_wave = (fundamental + harmonic_2 + harmonic_3 + harmonic_4 + harmonic_5 + harmonic_6) / 2.45
             
-            # --- 2. Polyphonic Fuzz (Soft-Clipped Sine) ---
+            # Polyphonic Fuzz
             drive = 8.0 
             driven_sine = fundamental * drive
             soft_clipped = driven_sine / (1.0 + abs(driven_sine))
@@ -114,184 +201,258 @@ CHUNK_SAMPLES = 512
 silent_chunk = array.array('h', [0] * CHUNK_SAMPLES)
 mix_chunk = array.array('h', [0] * CHUNK_SAMPLES)
 
-MAX_SIMULTANEOUS_KEYS = 2 # Limits the keypad scanner so we only read 2 inputs max at a time
-NUM_VOICES = 4            # But we process 4 audio voices so tails can overlap
-voices = []
-for _ in range(NUM_VOICES):
-    voices.append({
-        "buffer": None, 
-        "pos": 0, 
-        "vol": 0.0, 
-        "hold": 0, 
-        "freq": 0
-    })
+MAX_SIMULTANEOUS_KEYS = 2 
+NUM_VOICES = 4            
+voices = [{"buffer": None, "pos": 0, "vol": 0.0, "hold": 0, "freq": 0} for _ in range(NUM_VOICES)]
+was_strumming = False
 
 def scan_keypad():
     pressed = []
 
     for row_idx, row in enumerate(row_pins):
-        row.value(1) 
+        row.value(1)
 
         for col_idx, col in enumerate(col_pins):
-            if col.value() == 1: 
+            if col.value() == 1:
 
                 freq = FREQUENCIES[row_idx][col_idx]
                 note = NOTES[row_idx][col_idx]
 
-                pressed.append((freq,note))
+                pressed.append((freq, note))
 
                 if len(pressed) == MAX_SIMULTANEOUS_KEYS:
-                    row.value(0) 
+                    row.value(0)
                     return pressed
-                
-        row.value(0) 
 
-    return pressed 
+        row.value(0)
 
-# --- Main Event Loop ---
-print("The Stradibearius Quartet Polyphonic Instrument Ready.")
-print("Hold sensor to 'bow' up to 2 notes!")
+    return pressed
 
-was_strumming = False
+# --- 3. Snake Game Setup ---
+game_speed_ms = 100 
+snake = [[32, 32], [28, 32], [24, 32]]
+dx, dy = 4, 0
+next_dx, next_dy = 4, 0
+food = [random.randint(2, 30) * 4, random.randint(2, 14) * 4]
+score = 0
+last_update_time = time.ticks_ms()
+snake_safe_timer = 0
+
+# --- 4. State Machine ---
+current_mode = "SYNTH"
+last_btn_state = 1
+last_btn_time = 0
+
+print("System Ready! Click the joystick to swap modes.")
+
+# Display Logo on startup
+oled.fill(0)
+oled.blit(logo_fb, 0, 0)
+oled.show()
 
 try:
     while True:
-        # 1. Read Inputs
-        current_keys = scan_keypad()
+        current_time = time.ticks_ms()
 
-        current_freqs = [freq for freq, note in current_keys]
-
-        x_val = x_axis.read_u16()
-        is_strumming = (x_val < LEFT_THRESHOLD) or (x_val > RIGHT_THRESHOLD)
-        master_vol = slide_pot.read_u16() / 65535.0
-
-        # Read physical buttons
-        curr_dist = btn_distortion.value()
-        curr_rev = btn_reverb.value()
-        curr_bit = btn_bitcrush.value()
+        # ---------------------------------------------------------
+        # GLOBAL INPUT: MODE TOGGLE
+        # ---------------------------------------------------------
+        btn_state = joystick_btn.value()
         
-        #Distortion Button Toggle
-        if curr_dist == 0 and was_btn_dist == 1:
-            DISTORTION_ENABLED = not DISTORTION_ENABLED
-            print("Distortion Toggled:", DISTORTION_ENABLED)
-        was_btn_dist = curr_dist
-        
-        #Reverb Button Toggle
-        if curr_rev == 0 and was_btn_rev == 1:
-            REVERB_ENABLED = not REVERB_ENABLED
-            print("Reverb Toggled:", REVERB_ENABLED)
-        was_btn_rev = curr_rev
-        
-        #Bitcrush Button Toggle
-        if curr_bit == 0 and was_btn_bit == 1:
-            BITCRUSH_ENABLED = not BITCRUSH_ENABLED
-            print("Bitcrush Toggled:", BITCRUSH_ENABLED)
-        was_btn_bit = curr_bit
-        
-        # 2. Dynamic Voice Trigger Logic
-        if is_strumming and not was_strumming and len(current_freqs) > 0:
-            for freq, note in current_keys:
-                print('{"type":"note","value":"%s"}' % note)
-
-                target_voice = None
-                
-                # Option A: Check if this exact frequency is already playing and re-use it to prevent phasing
-                for v in voices:
-                    if v["buffer"] is not None and v["freq"] == freq:
-                        target_voice = v
-                        break
-                
-                # Option B: If not found, look for a completely empty voice
-                if target_voice is None:
-                    for v in voices:
-                        if v["buffer"] is None:
-                            target_voice = v
-                            break
-                            
-                # Option C: If all 4 voices are busy, steal the one with the lowest volume (oldest fading tail)
-                if target_voice is None:
-                    quietest_v = voices[0]
-                    for v in voices:
-                        if v["vol"] < quietest_v["vol"]:
-                            quietest_v = v
-                    target_voice = quietest_v
-                
-                # Assign the note to the dynamically chosen voice
-                target_voice["freq"] = freq
-                if DISTORTION_ENABLED:
-                    target_voice["buffer"] = sine_tone_buffers[freq]
-                else:
-                    target_voice["buffer"] = complex_tone_buffers[freq]
-                    
-                target_voice["pos"] = 0
-                target_voice["vol"] = 0.0  
-                target_voice["hold"] = 0
-
-        was_strumming = is_strumming
-        
-        # 3. Audio Playback, Mixing & Envelope Scaling
-        any_active = False
-        
-        # Clear the mix chunk first
-        for i in range(CHUNK_SAMPLES):
-            mix_chunk[i] = 0
-            
-        # Mix active voices
-        for v in voices:
-            if v["buffer"] is None:
-                continue
-                
-            any_active = True
-            is_sustain = is_strumming and (v["freq"] in current_freqs)
-            
-            if is_sustain:
-                v["hold"] += 1
-                if v["vol"] < 1.0:
-                    v["vol"] += 0.03  
-                if v["vol"] > 1.0:
-                    v["vol"] = 1.0
+        if btn_state == 0 and last_btn_state == 1 and time.ticks_diff(current_time, last_btn_time) > 300:
+            if current_mode == "SYNTH":
+                current_mode = "SNAKE"
+                last_update_time = time.ticks_ms() 
+                snake_safe_timer = time.ticks_ms()
             else:
-                # Reverb release envelope
-                if REVERB_ENABLED:
-                    v["vol"] *= 0.97  
-                else:
-                    v["vol"] *= 0.85  
-                    
-                if v["vol"] <= 0.01:
+                current_mode = "SYNTH"
+                for v in voices:
                     v["buffer"] = None
                     v["vol"] = 0.0
+                    
+                oled.fill(0)
+                oled.blit(logo_fb, 0, 0)
+                oled.show()
+                
+            last_btn_time = current_time
+            
+        last_btn_state = btn_state
+
+        # ---------------------------------------------------------
+        # MODE 1: SYNTHESIZER
+        # ---------------------------------------------------------
+        if current_mode == "SYNTH":
+            current_keys = scan_keypad()
+
+            current_freqs = [
+                freq for freq, note in current_keys
+            ]
+
+            x_val = joystick_x.read_u16()
+            y_val = joystick_y.read_u16()
+            master_vol = slide_pot.read_u16() / 65535.0
+            
+            is_strumming = (x_val < LEFT_THRESHOLD) or (x_val > RIGHT_THRESHOLD) or (y_val < LEFT_THRESHOLD) or (y_val > RIGHT_THRESHOLD)
+            
+            # Read physical effect buttons
+            curr_dist = btn_distortion.value()
+            curr_rev = btn_reverb.value()
+            curr_bit = btn_bitcrush.value()
+            
+            if curr_dist == 0 and was_btn_dist == 1:
+                DISTORTION_ENABLED = not DISTORTION_ENABLED
+            was_btn_dist = curr_dist
+            
+            if curr_rev == 0 and was_btn_rev == 1:
+                REVERB_ENABLED = not REVERB_ENABLED
+            was_btn_rev = curr_rev
+            
+            if curr_bit == 0 and was_btn_bit == 1:
+                BITCRUSH_ENABLED = not BITCRUSH_ENABLED
+            was_btn_bit = curr_bit
+            
+            # Dynamic Voice Trigger Logic
+            if is_strumming and not was_strumming and len(current_keys) > 0:
+                for freq, note in current_keys:
+
+                    print('{"type":"note","value":"%s"}' % note)
+
+                    target_voice = None
+                    
+                    for v in voices:
+                        if v["buffer"] is not None and v["freq"] == freq:
+                            target_voice = v
+                            break
+                    
+                    if target_voice is None:
+                        for v in voices:
+                            if v["buffer"] is None:
+                                target_voice = v
+                                break
+                                
+                    if target_voice is None:
+                        quietest_v = voices[0]
+                        for v in voices:
+                            if v["vol"] < quietest_v["vol"]:
+                                quietest_v = v
+                        target_voice = quietest_v
+                    
+                    target_voice["freq"] = freq
+                    if DISTORTION_ENABLED:
+                        target_voice["buffer"] = sine_tone_buffers[freq]
+                    else:
+                        target_voice["buffer"] = complex_tone_buffers[freq]
+                        
+                    target_voice["pos"] = 0
+                    target_voice["vol"] = 0.0  
+                    target_voice["hold"] = 0
+
+            was_strumming = is_strumming
+            any_active = False
+            
+            for i in range(CHUNK_SAMPLES):
+                mix_chunk[i] = 0
+                
+            for v in voices:
+                if v["buffer"] is None:
                     continue
                     
-            buf = v["buffer"]
-            buf_len = len(buf)
-            pos = v["pos"]
-            vol = v["vol"]
-            
-            int_vol = int(vol * master_vol * 256) 
-            
-            if int_vol >= 253:
-                for i in range(CHUNK_SAMPLES):
-                    mix_chunk[i] += buf[pos]
-                    pos += 1
-                    if pos >= buf_len: pos = 0
-            else:
-                for i in range(CHUNK_SAMPLES):
-                    mix_chunk[i] += (buf[pos] * int_vol) >> 8
-                    pos += 1
-                    if pos >= buf_len: pos = 0
-                        
-            v["pos"] = pos
-            
-        # 4. Master Output & Bitcrusher Effect
-        if BITCRUSH_ENABLED:
-            for i in range(CHUNK_SAMPLES):
-                mix_chunk[i] = mix_chunk[i] & 0xFC00
+                any_active = True
+                is_sustain = is_strumming and (v["freq"] in current_freqs)
                 
-        if any_active:
-            audio_out.write(mix_chunk)
-        else:
+                if is_sustain:
+                    v["hold"] += 1
+                    if v["vol"] < 1.0:
+                        v["vol"] += 0.03  
+                    if v["vol"] > 1.0:
+                        v["vol"] = 1.0
+                else:
+                    if REVERB_ENABLED:
+                        v["vol"] *= 0.97  
+                    else:
+                        v["vol"] *= 0.85  
+                        
+                    if v["vol"] <= 0.01:
+                        v["buffer"] = None
+                        v["vol"] = 0.0
+                        continue
+                        
+                buf = v["buffer"]
+                buf_len = len(buf)
+                pos = v["pos"]
+                vol = v["vol"]
+                
+                int_vol = int(vol * master_vol * 256) 
+                
+                if int_vol >= 253:
+                    for i in range(CHUNK_SAMPLES):
+                        mix_chunk[i] += buf[pos]
+                        pos += 1
+                        if pos >= buf_len: pos = 0
+                else:
+                    for i in range(CHUNK_SAMPLES):
+                        mix_chunk[i] += (buf[pos] * int_vol) >> 8
+                        pos += 1
+                        if pos >= buf_len: pos = 0
+                            
+                v["pos"] = pos
+                
+            if BITCRUSH_ENABLED:
+                for i in range(CHUNK_SAMPLES):
+                    mix_chunk[i] = mix_chunk[i] & 0xFC00
+                    
+            if any_active:
+                audio_out.write(mix_chunk)
+            else:
+                audio_out.write(silent_chunk)
+
+        # ---------------------------------------------------------
+        # MODE 2: SNAKE GAME
+        # ---------------------------------------------------------
+        elif current_mode == "SNAKE":
             audio_out.write(silent_chunk)
             
+            x_val = joystick_x.read_u16()
+            y_val = joystick_y.read_u16()
+            
+            if time.ticks_diff(current_time, snake_safe_timer) > 500:
+                if x_val < LEFT_THRESHOLD and dx == 0:
+                    next_dx, next_dy = -4, 0
+                elif x_val > RIGHT_THRESHOLD and dx == 0:
+                    next_dx, next_dy = 4, 0
+                elif y_val < LEFT_THRESHOLD and dy == 0:
+                    next_dx, next_dy = 0, -4
+                elif y_val > RIGHT_THRESHOLD and dy == 0:
+                    next_dx, next_dy = 0, 4
+
+            if time.ticks_diff(current_time, last_update_time) >= game_speed_ms:
+                dx, dy = next_dx, next_dy
+                head = [snake[0][0] + dx, snake[0][1] + dy]
+
+                if head[0] < 0 or head[0] >= 128 or head[1] < 0 or head[1] >= 64:
+                    snake = [[32, 32], [28, 32], [24, 32]]
+                    dx, dy = 4, 0
+                    next_dx, next_dy = 4, 0
+                    score = 0
+                    head = [36, 32]
+
+                snake.insert(0, head)
+
+                if abs(head[0] - food[0]) < 4 and abs(head[1] - food[1]) < 4:
+                    score += 1
+                    food = [random.randint(2, 30) * 4, random.randint(2, 14) * 4]
+                else:
+                    snake.pop()
+
+                oled.fill(0)
+                oled.rect(0, 0, 128, 64, 1)  
+                oled.fill_rect(food[0], food[1], 3, 3, 1)  
+                for segment in snake:
+                    oled.fill_rect(segment[0], segment[1], 3, 3, 1)  
+                oled.show()
+                
+                last_update_time = current_time
+
 except KeyboardInterrupt:
     audio_out.deinit()
     print("\nProgram safely stopped.")
