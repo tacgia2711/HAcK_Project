@@ -3,7 +3,7 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { useRef, useState, useEffect } from 'react'
 
 function Live({onExit}) {
-    const[currentNote, setNote] = useState('C')
+    const[currentNote, setNote] = useState('C4')
     const[currentEffect, setEffect] = useState('None')
 
     useEffect(() => {
@@ -48,12 +48,12 @@ function Live({onExit}) {
             </div>
 
             <div>
-                <button onClick={() => setNote('C')}>C</button>
-                <button onClick={() => setNote('D')}>D</button>
-                <button onClick={() => setNote('E')}>E</button>
-                <button onClick={() => setNote('F')}>F</button>
-                <button onClick={() => setNote('G')}>G</button>
-                <button onClick={() => setNote('A')}>A</button>
+                <button onClick={() => setNote('C4')}>C</button>
+                <button onClick={() => setNote('C#4')}>D</button>
+                <button onClick={() => setNote('D4')}>E</button>
+                <button onClick={() => setNote('D#4')}>F</button>
+                <button onClick={() => setNote('E4')}>G</button>
+                <button onClick={() => setNote('F4')}>A</button>
                 <button onClick={() => setNote('B')}>B</button>
             </div>
 
@@ -76,23 +76,34 @@ function Live({onExit}) {
 function Cube({Note}) {
     const cubeRef = useRef()
 
-    const scale =   Note === 'C' ? 1.1: 
-                    Note === 'D' ? 1.2:
-                    Note === 'E' ? 1.3:
-                    Note === 'F' ? 1.4: 
-                    Note === 'G' ? 1.5:
-                    Note === 'A' ? 1.6:
-                    Note === 'B' ? 1.7:
-                    1
+    const scale =   Note === 'C4' ? 0.9: 
+                    Note === 'C#4' ? 1.0:
+                    Note === 'D4' ? 1.1:
+                    Note === 'D#4' ? 1.2: 
+                    Note === 'E4' ? 1.3:
+                    Note === 'F4' ? 1.4:
+                    Note === 'F#4' ? 1.5:
+                    Note === 'G4' ? 1.6:
+                    Note === 'G#4' ? 1.7:
+                    Note === 'A4' ? 1.8:
+                    Note === 'A#4' ? 1.9:
+                    Note === 'B4' ? 2.0:
+                    0.1
 
-    const rotationSpeed =   Note === 'C' ? 0.005: 
-                            Note === 'D' ? 0.010:
-                            Note === 'E' ? 0.015:
-                            Note === 'F' ? 0.020: 
-                            Note === 'G' ? 0.025:
-                            Note === 'A' ? 0.030:
-                            Note === 'B' ? 0.035:
-                            0.001
+    const rotationSpeed =   Note === 'C4' ? 0.0005: 
+                            Note === 'C#4' ? 0.0010:
+                            Note === 'D4' ? 0.0015:
+                            Note === 'D#4' ? 0.0025: 
+                            Note === 'E4' ? 0.0030:
+                            Note === 'F4' ? 0.0035:
+                            Note === 'F#4' ? 0.0040:
+                            Note === 'G4' ? 0.0045:
+                            Note === 'G#4' ? 0.0050:
+                            Note === 'A4' ? 0.0060:
+                            Note === 'A#4' ? 0.0065:
+                            Note === 'B4' ? 0.0070:
+                            1
+
     useFrame(() => {
         cubeRef.current.rotation.x += rotationSpeed
         cubeRef.current.rotation.y += rotationSpeed
@@ -102,14 +113,19 @@ function Cube({Note}) {
         <mesh ref={cubeRef}
             scale={[scale, scale, scale]}>
             <boxGeometry args={[1.5,1.5,1.5]}/>
-            <meshStandardMaterial color={Note === 'C' ? 'yellow': 
-                                         Note === 'D' ? 'orange':
-                                         Note === 'E' ? 'red':
-                                         Note === 'F' ? 'green': 
-                                         Note === 'G' ? 'blue':
-                                         Note === 'A' ? 'purple':
-                                         Note === 'B' ? 'pink':
-                                         'white'
+            <meshStandardMaterial color={   Note === 'C4'  ? 'yellow' :
+                                            Note === 'C#4' ? 'gold' :
+                                            Note === 'D4'  ? 'orange' :
+                                            Note === 'D#4' ? 'coral' :
+                                            Note === 'E4'  ? 'red' :
+                                            Note === 'F4'  ? 'lime' :
+                                            Note === 'F#4' ? 'green' :
+                                            Note === 'G4'  ? 'cyan' :
+                                            Note === 'G#4' ? 'blue' :
+                                            Note === 'A4'  ? 'purple' :
+                                            Note === 'A#4' ? 'magenta' :
+                                            Note === 'B4'  ? 'pink' :
+                                            'white'
             } />
         </mesh>
     )
