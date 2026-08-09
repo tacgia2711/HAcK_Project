@@ -48,62 +48,62 @@ function Live({onExit}) {
 
             <h1>Live Mode</h1>
 
-           <div className = "LiveWaves">
+            <div className = "LiveWaves">
                 <Wave
                     Note = {currentNote}
                     Effects = {currentEffect}
                     Volume = {currentVolume}
                 />
-           </div>
-
-            <div className="EffectControl">
-                
             </div>
 
-            <h2>Current Note: {currentNote}</h2>
-
-            <div className="VolumeDisplay">
-
-                <div className="VolumeHeader">
-                    <span>Volume</span>
-                    <span>{Math.round(currentVolume * 100)}%</span>
+            
+            <div className = "LiveStatus">
+                <div className="StatusNoteCard">
+                    <p>Current Note:</p>
+                    <h2>{currentNote}</h2>
                 </div>
 
-                <div className="VolumeBar">
-                    <div
-                        className="VolumeLevel"
-                        style={{
-                            width: `${currentVolume * 100}%`
-                        }}
-                    />
+                <div className="StatusVolumeCard">
+                    <div className="VolumeHeader">
+                        <span>Volume</span>
+                        <span>{Math.round(currentVolume * 100)}%</span>
+                    </div>
+
+                    <div className="VolumeBar">
+                        <div className="VolumeLevel" style={{width: `${currentVolume * 100}%`}}/>
+                    </div>
+
                 </div>
 
-            <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.01"
-                value={currentVolume}
-                onChange={(event) =>
-                    setVolume(Number(event.target.value))
-                }
-            />
+                <div className = "StatusEffectCard">
+                    <p>Sound Effect</p>
 
+                    <div className = "EffectStatus">
+                        <span>Distortion:</span>
+                        <span className={currentEffect.distortion ? "EffectOn" : "EffectOff"}>
+                            {currentEffect.distortion ? " ON" : " OFF"}
+                        </span>
+                    </div>
+
+                    <div className = "EffectStatus">
+                        <span>Reverb:</span>
+                        <span className={currentEffect.reverb ? "EffectOn" : "EffectOff"}>
+                            {currentEffect.reverb ? " ON" : " OFF"}
+                        </span>
+                    </div>
+
+                    <div className = "EffectStatus">
+                        <span>Bitcrush:</span>
+                        <span className={currentEffect.bitcrush ? "EffectOn" : "EffectOff"}>
+                            {currentEffect.bitcrush ? " ON" : " OFF"}
+                        </span>
+                    </div>
+
+                </div>
             </div>
-            <div className = "SoundEffect">
-                <h2>
-                    Distortion: {currentEffect.distortion ? "On" : "Off"}
-                </h2>
-                <h2>
-                    Reverb: {currentEffect.reverb ? "On" : "Off"}
-                </h2>
-                <h2>
-                    Bitcrush: {currentEffect.bitcrush ? "On" : "Off"}
-                </h2>
-            </div>
+            
             <button onClick={onExit}>Exit</button>
         </div>
-
     )
 }
 
