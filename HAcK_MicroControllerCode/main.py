@@ -10,8 +10,6 @@ from machine import Pin, ADC, SoftI2C, I2S
 import ssd1306
 import framebuf
 
-# --- 1. Hardware Setup ---
-
 # OLED Screen
 i2c = SoftI2C(sda=Pin(0), scl=Pin(1), freq=400000)
 oled = ssd1306.SSD1306_I2C(128, 64, i2c)
@@ -120,8 +118,8 @@ joystick_y = ADC(Pin(26))
 slide_pot = ADC(Pin(27)) 
 joystick_btn = Pin(22, Pin.IN, Pin.PULL_UP)
 
-LEFT_THRESHOLD = 8000
-RIGHT_THRESHOLD = 58000
+LEFT_THRESHOLD = 29000
+RIGHT_THRESHOLD = 35000
 
 # Matrix Keypad
 row_pins = [Pin(i, Pin.OUT) for i in range(2, 6)]
@@ -129,18 +127,18 @@ col_pins = [Pin(i, Pin.IN, Pin.PULL_DOWN) for i in range(6, 9)]
 
 # --- 2. Musical Setup (Dual Wavetables) ---
 FREQUENCIES = [
-    [261.63, 277.18, 293.66],  # C4, C#4, D4 
-    [311.13, 329.63, 349.23],  # D#4, E4, F4
-    [369.99, 392.00, 415.30],  # F#4, G4, G#4
-    [440.00, 466.16, 493.88]   # A4, A#4, B4
+    [261.63, 293.66, 311.13],  # C4, D4 D#4
+    [329.63, 349.23, 369.99],  # E4, F4, F#4
+    [392.00, 415.30, 440.00],  # G4, G#4, A4
+    [493.88, 493.88, 523.25]   # B4, B4, C5
 ]
 
 #Notes
 NOTES = [
-    ["C4",  "C#4", "D4"],
-    ["D#4", "E4",  "F4"],
-    ["F#4", "G4",  "G#4"],
-    ["A4",  "A#4", "B4"]
+    ["C4",  "D4", "D#4"],
+    ["E4", "F4",  "F#4"],
+    ["G4", "G#4",  "A4"],
+    ["B4",  "B4", "C5"]
 ]
 
 print("Initializing dual wavetables...")

@@ -111,33 +111,38 @@ function Wave({Note, Effects, Volume}) {
     const echoWave1 = useRef()
     const echoWave2 = useRef()
 
-    const index =   Note === 'C4' ? 0: 
-                    Note === 'D4' ? 1:
-                    Note === 'D#4' ? 2:
-                    Note === 'E4' ? 3: 
-                    Note === 'F4' ? 4:
-                    Note === 'F#4' ? 5:
-                    Note === 'G4' ? 6:
-                    Note === 'G#4' ? 7:
-                    Note === 'A4' ? 8:
-                    Note === 'B4' ? 9:
-                    Note === 'B4' ? 10:
-                    Note === 'C5' ? 11:
-                    12
-    
-    const waveColor =   Note === 'C4'  ? 'yellow' :
-                        Note === 'C5' ? 'gold' :
-                        Note === 'D4'  ? 'orange' :
-                        Note === 'D#4' ? 'coral' :
-                        Note === 'E4'  ? 'red' :
-                        Note === 'F4'  ? 'lime' :
-                        Note === 'F#4' ? 'green' :
-                        Note === 'G4'  ? 'cyan' :
-                        Note === 'G#4' ? 'blue' :
-                        Note === 'A4'  ? 'purple' :
-                        Note === 'B4'  ? 'pink' :
-                        'white'
+    const noteIndex = {
+        'C4': 0,
+        'D4': 1,
+        'D#4': 2,
+        'E4': 3,
+        'F4': 4,
+        'F#4': 5,
+        'G4': 6,
+        'G#4': 7,
+        'A4': 8,
+        'B4': 9,
+        'C5': 10
+    }
 
+    const index = noteIndex[Note] ?? 0
+    
+    const noteColors = {
+        'C4': 'yellow',
+        'D4': 'orange',
+        'D#4': 'coral',
+        'E4': 'red',
+        'F4': 'lime',
+        'F#4': 'green',
+        'G4': 'cyan',
+        'G#4': 'blue',
+        'A4': 'purple',
+        'B4': 'pink',
+        'C5': 'gold'
+    }
+
+    const waveColor = noteColors[Note] ?? 'white'
+    
     useEffect(() => {
         let animationID
         let phase = 0

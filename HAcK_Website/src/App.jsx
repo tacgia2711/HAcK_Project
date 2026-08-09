@@ -6,6 +6,7 @@ import kienNguyen from './assets/kienNguyen.png'
 import kevinAlvarado from './assets/kevinAlvarado.png'
 import matthewKim from './assets/kevinKim.png'
 import chrisPenick from './assets/chrisPenick.png'
+import logo from './assets/logo.png'
 
 function MemberCard ({firstName, lastName, role, intro, image}) {
     const [openCard, setOpen] = useState(false)
@@ -40,7 +41,7 @@ function App() {
             <div className = "HomeSection">
 
                 <h1 className="HackTitle">HAcK 2026</h1>
-
+                <img src={logo} alt={'Picture of team 15 logo'} className = "LogoImage"></img>
                 <h1 className="GroupName">The Stradibearius Quartet</h1>
                 
             </div>

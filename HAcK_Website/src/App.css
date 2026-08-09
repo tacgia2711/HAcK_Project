@@ -18,6 +18,12 @@
     background: var(--ucla-blue);
 }
 
+.LogoImage {
+    width: 250px;
+    height: auto;
+    object-fit: contain;
+}
+
 .MemberCard {
     width: 95%;
     max-width: 950px;
