@@ -93,7 +93,7 @@ function Wave({Note, Effects}) {
                     Note === 'D#4' ? 3: 
                     Note === 'E4' ? 4:
                     Note === 'F4' ? 5:
-                    Note === 'F#4' ? 5:
+                    Note === 'F#4' ? 6:
                     Note === 'G4' ? 7:
                     Note === 'G#4' ? 8:
                     Note === 'A4' ? 9:
@@ -115,13 +115,68 @@ function Wave({Note, Effects}) {
                         Note === 'B4'  ? 'pink' :
                         'white'
 
-    useFrame(() => {
+    useEffect(() => {
+        let animationID
+        let phase = 0
 
-    })
+        const width = 900
+        const height = 350
+        const centerY = height/2
+
+        const cycles = 2 + index *0.25
+        const speed = 0.04 + index*0.003
+        const amplitude = 60
+        
+        function createWave() {
+            let path = ''
+
+            for (let x = 0; x <= width; x = x +5) {
+                const angle = (x / width) * Math.PI * 2 * cycles + phase
+
+                let y = Math.sin(angle) * amplitude
+
+                if (Effects.distortion) {
+                    y += Math.sin(angle*3) * 20
+                }
+
+                if (Effects.bitcrush) {
+                    y = Math.round(y/15) * 15
+                }
+
+                const screenY = centerY + y
+
+                if (x === 0) {
+                    path = `M ${x} ${screenY}`
+                } else {
+                    path += ` L ${x} ${screenY}`
+                }
+            }
+
+             return path
+        }
+
+        function animate() {
+            phase += speed
+
+            if (mainWave.current) {
+                mainWave.current.setAttribute('d', createWave())
+            }
+
+            animationID = requestAnimationFrame(animate)
+        }
+        
+         animate()
+
+         return () => {
+            cancelAnimationFrame(animationID)
+         }
+    }, [Note,Effects,index])
 
     return (
-        <div>
-            
+        <div className= "WaveVisualize">
+            <svg viewBox="0 0 900 350" preserveAspectRatio='none'>
+                <path ref={mainWave} fill= "none" stroke={waveColor} strokeWidth={4}/>
+            </svg>
         </div>
     )
 }
