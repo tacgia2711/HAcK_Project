@@ -112,21 +112,21 @@ function Wave({Note, Effects, Volume}) {
     const echoWave2 = useRef()
 
     const index =   Note === 'C4' ? 0: 
-                    Note === 'C#4' ? 1:
-                    Note === 'D4' ? 2:
-                    Note === 'D#4' ? 3: 
-                    Note === 'E4' ? 4:
-                    Note === 'F4' ? 5:
-                    Note === 'F#4' ? 6:
-                    Note === 'G4' ? 7:
-                    Note === 'G#4' ? 8:
-                    Note === 'A4' ? 9:
-                    Note === 'A#4' ? 10:
-                    Note === 'B4' ? 11:
+                    Note === 'D4' ? 1:
+                    Note === 'D#4' ? 2:
+                    Note === 'E4' ? 3: 
+                    Note === 'F4' ? 4:
+                    Note === 'F#4' ? 5:
+                    Note === 'G4' ? 6:
+                    Note === 'G#4' ? 7:
+                    Note === 'A4' ? 8:
+                    Note === 'B4' ? 9:
+                    Note === 'B4' ? 10:
+                    Note === 'C5' ? 11:
                     12
     
     const waveColor =   Note === 'C4'  ? 'yellow' :
-                        Note === 'C#4' ? 'gold' :
+                        Note === 'C5' ? 'gold' :
                         Note === 'D4'  ? 'orange' :
                         Note === 'D#4' ? 'coral' :
                         Note === 'E4'  ? 'red' :
@@ -135,7 +135,6 @@ function Wave({Note, Effects, Volume}) {
                         Note === 'G4'  ? 'cyan' :
                         Note === 'G#4' ? 'blue' :
                         Note === 'A4'  ? 'purple' :
-                        Note === 'A#4' ? 'magenta' :
                         Note === 'B4'  ? 'pink' :
                         'white'
 

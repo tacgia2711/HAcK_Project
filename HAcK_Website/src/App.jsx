@@ -2,12 +2,18 @@ import { useState } from 'react'
 import Live from './Live.jsx'
 import './App.css'
 
-function MemberCard ({firstName, lastName, role, intro}) {
+import kienNguyen from './assets/kienNguyen.png'
+import kevinAlvarado from './assets/kevinAlvarado.png'
+import matthewKim from './assets/kevinKim.png'
+import chrisPenick from './assets/chrisPenick.png'
+
+function MemberCard ({firstName, lastName, role, intro, image}) {
     const [openCard, setOpen] = useState(false)
 
     return (
         <div className = {`MemberCard ${openCard ? 'open' : ''}`}>
             <div className = "MemberMain">
+                <img src={image} alt={`${firstName} ${lastName}`} className = "MemberImage"></img>
                 <h3>{firstName} {lastName}</h3>
 
                 <p>Role: {role}</p>
@@ -49,13 +55,15 @@ function App() {
                     firstName = "Kien"
                     lastName = "Nguyen"
                     role = "Web Developer - Frontend and Backend"
-                    intro = ""
+                    image = {kienNguyen}
+                    intro = "Hi guys! My name is Kien Nguyen, and I am a Computer Engineering major. I transferred from Irvine Valley College. I’m originally from Vietnam, but now I study and live in Fountain Valley, CA. I like to play League of Legends or any games on Steam during my free time, and I also play badminton on the Weekends. Feel free to DM me any games you are interested in, or when you need a League player in the team xD"
                 />
 
                 <MemberCard 
                     firstName = "Matthew"
                     lastName= "Kim"
                     role = "Circuit Designer - Tester"
+                    image = {matthewKim}
                     intro = "My name is Matthew Kim, and I’m an Electrical Engineering major transferring to UCLA from El Camino College! I was born and raised in Torrance, California, but currently live in Long Beach. I’m a big fan of old-school video games and CRT TVs. My favorite food to eat is Korean BBQ. "
                 />
 
@@ -63,6 +71,7 @@ function App() {
                     firstName = "Chris"
                     lastName = "Penick"
                     role = "CAD Designer - Chassis Assembler"
+                    image = {chrisPenick}
                     intro = "My name is Chris Penick, and I am a Mechanical Engineering major transferring from Cabrillo College in Santa Cruz. I was born and raised in San Jose, California, but have been living in Santa Cruz for the past two years while attending community college. Recently, I have been rock-climbing as often as I can, weightlifting, and watching tv/movies with my family and friends!"
                 />
 
@@ -70,6 +79,7 @@ function App() {
                     firstName = "Kevin"
                     lastName = "Alvarado"
                     role = "Circuit Designer - Tester"
+                    image = {kevinAlvarado}
                     intro = "My name is Kevin Alvarado. My major is electrical engineering. I am from South Central near USC for reference, and my community college is Los Angeles Trade Technical College. My favorite football team is Real Madrid. My favorite food is the Fried Rice from Vim’s Thai food in North Hollywood. "
                 />
             </div>

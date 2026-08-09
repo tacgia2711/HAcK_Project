@@ -12,12 +12,6 @@ import framebuf
 
 # --- 1. Hardware Setup ---
 
-i2c = SoftI2C(sda=Pin(0), scl=Pin(1), freq=400000)
-
-print("I2C scan:", i2c.scan())
-
-oled = ssd1306.SSD1306_I2C(128, 64, i2c)
-
 # OLED Screen
 i2c = SoftI2C(sda=Pin(0), scl=Pin(1), freq=400000)
 oled = ssd1306.SSD1306_I2C(128, 64, i2c)

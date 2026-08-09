@@ -33,6 +33,15 @@
     width: 650px;
 }
 
+/*Member Image*/
+.MemberImage {
+    width: 110px;
+    height: 110px;
+    object-fit: cover;
+    border-radius: 70%;
+    border: 3px solid white;
+}
+
 /*Member Main section - Names and Role*/
 .MemberMain {
     display: grid;
