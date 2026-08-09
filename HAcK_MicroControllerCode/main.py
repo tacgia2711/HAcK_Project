@@ -250,6 +250,8 @@ oled.fill(0)
 oled.blit(logo_fb, 0, 0)
 oled.show()
 
+last_sent_volume = -1
+
 try:
     while True:
         current_time = time.ticks_ms()
@@ -291,6 +293,10 @@ try:
             x_val = joystick_x.read_u16()
             y_val = joystick_y.read_u16()
             master_vol = slide_pot.read_u16() / 65535.0
+
+            if abs(master_vol - last_sent_volume) > 0.05:
+                print('{"type":"volume","value":%.2f}' % master_vol)
+                last_sent_volume = master_vol
             
             is_strumming = (x_val < LEFT_THRESHOLD) or (x_val > RIGHT_THRESHOLD) or (y_val < LEFT_THRESHOLD) or (y_val > RIGHT_THRESHOLD)
             
@@ -302,19 +308,19 @@ try:
             #Distortion Button Toggle
             if curr_dist == 0 and was_btn_dist == 1:
                 DISTORTION_ENABLED = not DISTORTION_ENABLED
-                print("Distortion Toggled:", DISTORTION_ENABLED)
+                print('{"type":"effect","value":"distortion","enabled":%s}'% str(DISTORTION_ENABLED).lower())               
             was_btn_dist = curr_dist
                     
             #Reverb Button Toggle
             if curr_rev == 0 and was_btn_rev == 1:
                 REVERB_ENABLED = not REVERB_ENABLED
-                print("Reverb Toggled:", REVERB_ENABLED)
+                print('{"type":"effect","value":"reverb","enabled":%s}' % str(REVERB_ENABLED).lower())   
             was_btn_rev = curr_rev
                     
-                    #Bitcrush Button Toggle
+            #Bitcrush Button Toggle
             if curr_bit == 0 and was_btn_bit == 1:
                 BITCRUSH_ENABLED = not BITCRUSH_ENABLED
-                print("Bitcrush Toggled:", BITCRUSH_ENABLED)
+                print('{"type":"effect","value":"bitcrush","enabled":%s}'% str(BITCRUSH_ENABLED).lower())            
             was_btn_bit = curr_bit
             
             # Dynamic Voice Trigger Logic

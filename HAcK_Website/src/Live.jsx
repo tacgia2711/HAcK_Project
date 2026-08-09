@@ -4,6 +4,7 @@ import { useRef, useState, useEffect } from 'react'
 function Live({onExit}) {
     const[currentNote, setNote] = useState('C4')
     const[currentEffect, setEffect] = useState({distortion: false, reverb: false, bitcrush: false})
+    const [volume, setVolume] = useState(0.5)
 
     useEffect(() => {
         const socket = new WebSocket('ws://localhost:8765')
@@ -27,6 +28,10 @@ function Live({onExit}) {
                     [data.value]: data.enabled
                 }))
             }
+
+            if (data.type === 'volume') {
+                setVolume(data.value)
+            }
         }
 
         socket.onclose = () => {
@@ -47,17 +52,35 @@ function Live({onExit}) {
                 <Wave
                     Note = {currentNote}
                     Effects = {currentEffect}
+                    Volume = {volume}
                 />
            </div>
 
             <div>
-                <button onClick={() => setNote('C4')}>C</button>
-                <button onClick={() => setNote('C#4')}>D</button>
-                <button onClick={() => setNote('D4')}>E</button>
-                <button onClick={() => setNote('D#4')}>F</button>
-                <button onClick={() => setNote('E4')}>G</button>
-                <button onClick={() => setNote('F4')}>A</button>
-                <button onClick={() => setNote('B4')}>B</button>
+                <button onClick={() => setNote('C4')}>C4</button>
+                <button onClick={() => setNote('C#4')}>C#4</button>
+                <button onClick={() => setNote('D4')}>D4</button>
+                <button onClick={() => setNote('D#4')}>D#4</button>
+                <button onClick={() => setNote('E4')}>E4</button>
+                <button onClick={() => setNote('F4')}>F4</button>
+                <button onClick={() => setNote('F#4')}>F#4</button>
+                <button onClick={() => setNote('G4')}>G4</button>
+                <button onClick={() => setNote('G#4')}>G#4</button>
+                <button onClick={() => setNote('A4')}>A4</button>
+                <button onClick={() => setNote('A#4')}>A#4</button>
+                <button onClick={() => setNote('B4')}>B4</button>
+                <button onClick={() => setEffect(prev => ({
+                                                ...prev,
+                                                distortion: !prev.distortion
+                }))}> Distortion </button>
+                <button onClick={() => setEffect(prev => ({
+                                                ...prev,
+                                                reverb: !prev.reverb
+                }))}> Reverb </button>
+                <button onClick={() => setEffect(prev => ({
+                                                ...prev,
+                                                bitcrush: !prev.bitcrush
+                }))}>Bitcrush</button>
             </div>
 
             <div className="EffectControl">
@@ -65,6 +88,7 @@ function Live({onExit}) {
             </div>
 
             <h2>Current Note: {currentNote}</h2>
+            <h2>Volume: {Math.round(volume * 100)}%</h2>
             <div className = "SoundEffect">
                 <h2>
                     Distortion: {currentEffect.distortion ? "On" : "Off"}
@@ -82,7 +106,7 @@ function Live({onExit}) {
     )
 }
 
-function Wave({Note, Effects}) {
+function Wave({Note, Effects, Volume}) {
     const mainWave = useRef()
     const echoWave1 = useRef()
     const echoWave2 = useRef()
@@ -125,15 +149,15 @@ function Wave({Note, Effects}) {
 
         const cycles = 2 + index *0.25
         const speed = 0.04 + index*0.003
-        const amplitude = 60
+        const amplitude = 10 + Volume*90
         
-        function createWave() {
+        function createWave(phaseOffset = 0, amplitudeMultiplier = 1) {
             let path = ''
 
             for (let x = 0; x <= width; x = x +5) {
-                const angle = (x / width) * Math.PI * 2 * cycles + phase
+                const angle = (x / width) * Math.PI * 2 * cycles + phase + phaseOffset
 
-                let y = Math.sin(angle) * amplitude
+                let y = Math.sin(angle) * amplitude * amplitudeMultiplier
 
                 if (Effects.distortion) {
                     y += Math.sin(angle*3) * 20
@@ -162,6 +186,32 @@ function Wave({Note, Effects}) {
                 mainWave.current.setAttribute('d', createWave())
             }
 
+            if (Effects.reverb) {
+
+                if (echoWave1.current) {
+                    echoWave1.current.setAttribute(
+                        'd',
+                        createWave(-0.5, 0.85)
+                    )
+                }
+
+                if (echoWave2.current) {
+                    echoWave2.current.setAttribute(
+                        'd',
+                        createWave(-1.0, 0.7)
+                    )
+                }
+            } else {
+
+                if (echoWave1.current) {
+                    echoWave1.current.setAttribute('d', '')
+                }
+
+                if (echoWave2.current) {
+                    echoWave2.current.setAttribute('d', '')
+                }
+            }
+
             animationID = requestAnimationFrame(animate)
         }
         
@@ -175,7 +225,9 @@ function Wave({Note, Effects}) {
     return (
         <div className= "WaveVisualize">
             <svg viewBox="0 0 900 350" preserveAspectRatio='none'>
-                <path ref={mainWave} fill= "none" stroke={waveColor} strokeWidth={4}/>
+                <path ref={echoWave2} fill="none" stroke={waveColor} strokeWidth="3" opacity="0.15" />
+                <path ref={echoWave1} fill="none" stroke={waveColor} strokeWidth="3" opacity="0.30"/>
+                <path ref={mainWave} fill="none" stroke={waveColor} strokeWidth= {Effects.distortion ? 7 : 4} strokeLinecap={Effects.bitcrush ? "square" : "round"}/>
             </svg>
         </div>
     )
