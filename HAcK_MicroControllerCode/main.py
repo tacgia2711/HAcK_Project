@@ -12,6 +12,12 @@ import framebuf
 
 # --- 1. Hardware Setup ---
 
+i2c = SoftI2C(sda=Pin(0), scl=Pin(1), freq=400000)
+
+print("I2C scan:", i2c.scan())
+
+oled = ssd1306.SSD1306_I2C(128, 64, i2c)
+
 # OLED Screen
 i2c = SoftI2C(sda=Pin(0), scl=Pin(1), freq=400000)
 oled = ssd1306.SSD1306_I2C(128, 64, i2c)
@@ -290,8 +296,6 @@ try:
                 freq for freq, note in current_keys
             ]
 
-            x_val = joystick_x.read_u16()
-            y_val = joystick_y.read_u16()
             x_val = joystick_x.read_u16()
             y_val = joystick_y.read_u16()
             master_vol = slide_pot.read_u16() / 65535.0

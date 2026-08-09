@@ -63,7 +63,7 @@ function App() {
                     firstName = "Chris"
                     lastName = "Penick"
                     role = "CAD Designer - Chassis Assembler"
-                    intro = ""
+                    intro = "My name is Chris Penick, and I am a Mechanical Engineering major transferring from Cabrillo College in Santa Cruz. I was born and raised in San Jose, California, but have been living in Santa Cruz for the past two years while attending community college. Recently, I have been rock-climbing as often as I can, weightlifting, and watching tv/movies with my family and friends!"
                 />
 
                 <MemberCard 

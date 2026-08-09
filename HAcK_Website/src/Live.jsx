@@ -7,7 +7,7 @@ function Live({onExit}) {
     const[currentVolume, setVolume] = useState(0.7)
 
     useEffect(() => {
-        const socket = new WebSocket('ws://localhost:8765')
+        const socket = new WebSocket('ws://192.168.50.225:8765')
 
         socket.onopen = () => {
             console.log('Connected to WebSocket server')
@@ -55,7 +55,6 @@ function Live({onExit}) {
                     Volume = {currentVolume}
                 />
             </div>
-
             
             <div className = "LiveStatus">
                 <div className="StatusNoteCard">
