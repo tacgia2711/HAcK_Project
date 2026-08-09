@@ -292,9 +292,11 @@ try:
 
             x_val = joystick_x.read_u16()
             y_val = joystick_y.read_u16()
+            x_val = joystick_x.read_u16()
+            y_val = joystick_y.read_u16()
             master_vol = slide_pot.read_u16() / 65535.0
 
-            if abs(master_vol - last_sent_volume) > 0.05:
+            if abs(master_vol - last_sent_volume) > 0.015:
                 print('{"type":"volume","value":%.2f}' % master_vol)
                 last_sent_volume = master_vol
             
