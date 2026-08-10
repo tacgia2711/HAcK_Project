@@ -81,6 +81,7 @@
     cursor: pointer;
 
     transition: 0.2s ease;
+    margin-top: 10px;
 }
 
 .CardButton:hover {
@@ -177,6 +178,34 @@
 }
 
 /*Main Parent of the Live Section*/
+
+.LiveSection button {
+    background: var(--ucla-gold);
+    color: var(--ucla-dark);
+
+    border: none;
+    border-radius: 10px;
+
+    padding: 14px 28px;
+
+    font-size: 18px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+    margin-top: 30px;
+}
+
+.LiveSection button:hover {
+    background: white;
+    transform: scale(1.05);
+}
+
+.LiveSection button:active {
+    transform: scale(0.98);
+}
+
 .LiveMode {
     position: fixed;
     top: 0;

@@ -121,7 +121,7 @@ function App() {
             </div>
 
             <div className = "LiveSection">
-                <button onClick={() => setLive(true)}>Enter Live Mode</button>
+                <button onClick={() => setLive(true)}>LIVE MODE!</button>
             </div>
 
             {liveMode && (
