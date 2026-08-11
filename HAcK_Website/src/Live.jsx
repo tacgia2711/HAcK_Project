@@ -2,6 +2,7 @@ import './App.css'
 import { useRef, useState, useEffect } from 'react'
 
 function Live({onExit}) {
+
     const[currentNote, setNote] = useState('C4')
     const[currentEffect, setEffect] = useState({distortion: false, reverb: false, bitcrush: false})
     const[currentVolume, setVolume] = useState(0.7)

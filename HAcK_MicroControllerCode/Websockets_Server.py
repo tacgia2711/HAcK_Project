@@ -12,6 +12,7 @@ pico = serial.Serial(PICO_PORT, 115200, timeout = 0.1)
 
 connected_clients = set()
 
+#Establlishing connection to the Website to Pico
 async def handler(websocket):
     print("Website connected")
 
@@ -24,6 +25,7 @@ async def handler(websocket):
         connected_clients.discard(websocket)    
         print("Website Disconnected")
 
+#Read inputs from the Pico through Serial
 async def pico_read():
     while True:
         line = await asyncio.to_thread(pico.readline)
@@ -60,6 +62,7 @@ async def pico_read():
         except Exception as error:
             print("Serial message error: ", error)
 
+#Establishing Connection to the Pico throuhg USB COM7
 async def main():
 
     print("Connected to Pico on", PICO_PORT)
