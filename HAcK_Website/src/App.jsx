@@ -10,6 +10,7 @@ import matthewKim from './assets/kevinKim.png'
 import chrisPenick from './assets/chrisPenick.png'
 import logo from './assets/logo.png'
 import instr_pic from './assets/instrument_pic.JPG'
+import performace_vid from './assets/team15.mp4'
 
 //Helper function for member cards section
 function MemberCard ({firstName, lastName, role, intro, image}) {
@@ -123,7 +124,7 @@ function App() {
 
                     <div className = "InstrumentSubSec">
                         <h3>Sound Section</h3>
-                        <li>A 4x3 keypad can be pressed down to from notes from C4-C5</li>
+                        <li>A 4x3 keypad can be pressed down to form notes from C4-C5</li>
                         <li>A joystick acts as the strumming control</li> 
                         <li>A slide potentiometer controls volume.</li>  
                         <li>Three ON/OFF buttons for three sound effects: Distortion, Reverb, and Bitcrush</li>  
@@ -134,7 +135,38 @@ function App() {
             </div>
 
             <div className = "MusicSection">
+                 <h2 className="MusicTitle">Music Set List</h2>
 
+                <div className="MusicList">
+
+                    <div className="MusicCard">
+                        <h3>Twinkle, Twinkle, Little Star</h3>
+                        <p>Notes used: C4, D4, E4, F4, G4, A4</p>
+                        <p>Effect used: Reverb</p>
+                    </div>
+
+                    <div className="MusicCard">
+                        <h3>Mary Had a Little Lamb</h3>
+                        <p>Notes used:C4, D4, E4, G4</p>
+                        <p>Effect used: None</p>
+                    </div>
+
+                    <div className="MusicCard">
+                        <h3>Ode to Joy</h3>
+                        <p>Notes used:C4, D4, E4, F4, G4</p>
+                        <p>Effect used: Bitcrush</p>
+                    </div>
+
+                </div>
+
+                <div className="MusicVideo">
+                    <h3>Performance Video</h3>
+
+                    <video controls className="PerformanceVideo">
+                        <source src={performace_vid} type="video/mp4" />
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
             </div>
 
             <div className = "LiveSection">
