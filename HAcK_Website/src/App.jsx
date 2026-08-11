@@ -1,13 +1,17 @@
+//Import file and functions for the website
 import { useState } from 'react'
 import Live from './Live.jsx'
 import './App.css'
 
+//Picture files
 import kienNguyen from './assets/kienNguyen.png'
 import kevinAlvarado from './assets/kevinAlvarado.png'
 import matthewKim from './assets/kevinKim.png'
 import chrisPenick from './assets/chrisPenick.png'
 import logo from './assets/logo.png'
+import instr_pic from './assets/instrument_pic.JPG'
 
+//Helper function for member cards section
 function MemberCard ({firstName, lastName, role, intro, image}) {
     const [openCard, setOpen] = useState(false)
 
@@ -33,23 +37,30 @@ function MemberCard ({firstName, lastName, role, intro, image}) {
     )
 }
 
+//Main Frontend App
 function App() {
+
+    //True/false variables for buttons
     const [liveMode, setLive] = useState(false)
     
     return (
-        <div className = "HAcK_Website">
-            <div className = "HomeSection">
 
+        /*Main Website*/
+        
+        <div className = "HAcK_Website">
+            
+            {/*Section 1 - Group name and Logo*/}
+            <div className = "HomeSection">
+                
+                {/*Group name and logo*/}
                 <h1 className="HackTitle">HAcK 2026</h1>
                 <img src={logo} alt={'Picture of team 15 logo'} className = "LogoImage"></img>
                 <h1 className="GroupName">The Stradibearius Quartet</h1>
                 
             </div>
 
-            <div className = "MusicSection">
-
-            </div>
-
+            {/*Section 2 - Members Information*/}
+            {/*Member Cards - including name, role, and info*/}
             <div className = "BandSection">
 
                 <MemberCard 
@@ -85,20 +96,19 @@ function App() {
                 />
             </div>
 
+            {/*Section 3 - Group name and Info*/}
             <div className = "InstrumentSection">
 
                 <h2 className='InstrumentTitle'>Instruments Info</h2>
                 
+                {/*Picture of the instrument*/}
                 <div className="InstrumentImage">
-                    
-                    <p>
-                        Place picture of instrument here
-                    </p>
+
+                    <img src={instr_pic} alt={'Picture of the intrument'} className = "InstrumentImage"></img>
 
                 </div>
 
-                <h2 className="InstrumentName">Name of the instrument here</h2>
-                
+                {/*Info of the instrument*/}
                 <div className = "InstrumentInfo">
 
                     <div className = "InstrumentSubSec">
@@ -117,6 +127,10 @@ function App() {
                     </div>
 
                 </div>
+
+            </div>
+
+            <div className = "MusicSection">
 
             </div>
 
